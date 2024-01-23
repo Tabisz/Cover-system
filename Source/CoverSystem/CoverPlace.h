@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/ArrowComponent.h"
 #include "GameFramework/Actor.h"
 #include "CoverPlace.generated.h"
 
@@ -26,11 +27,25 @@ class COVERSYSTEM_API ACoverPlace : public AActor
 public:	
 	ACoverPlace();
 
-	UFUNCTION(BlueprintCallable, Category="Debug")
-	void DrawDebugVisibilityCone(EDirection directionToDraw, float angleDegree, float searchDistance, bool isCovered);
+	UFUNCTION(BlueprintCallable)
+	void GetAllValiableTargets();
+
+	UFUNCTION(BlueprintCallable)
+	void FilterTargetsByDistance();
+
+	UFUNCTION(BlueprintCallable)
+	void FilterTargetsByAngles();
+	
+	
+	
+	// UFUNCTION(BlueprintCallable, Category="Debug")
+	// void DrawDebugLineBetween(FVector start, FVector End, FColor color);
 	
 	UFUNCTION(BlueprintCallable, Category="Debug")
-	void DrawDebugVisibilityLine(float angleDegree, float Distance, FColor color);
+	void DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered);
+	
+	UFUNCTION(BlueprintCallable, Category="Debug")
+	void DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color);
 	
 	UPROPERTY(EditAnywhere, Category="Debug")
 	bool drawRight = true;
@@ -49,9 +64,7 @@ public:
 	bool coverUp;
 	UPROPERTY(EditAnywhere, Category="Cover")
 	bool coverDown;
-	
-protected:
-	virtual void BeginPlay() override;
+
 
 public:	
 	virtual void Tick(float DeltaTime) override;

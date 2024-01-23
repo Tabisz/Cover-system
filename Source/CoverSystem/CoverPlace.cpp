@@ -10,61 +10,6 @@ ACoverPlace::ACoverPlace()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float angleDegree, float searchDistance, bool isCovered)
-{
-	float offsetAngle = 0;
-	switch (directionToDraw)
-	{
-	case EDirection::UP_DIRECTION:
-	offsetAngle = 90;
-		break;
-	case EDirection::DOWN_DIRECTION:
-		offsetAngle = -90;
-		break;
-	case EDirection::LEFT_DIRECTION:
-		offsetAngle = 180;
-		break;
-	case EDirection::RIGHT_DIRECTION:
-		//default
-		break;
-	default: ;
-	}
-	FColor drawColor;
-	if(isCovered)
-		drawColor = FColor::Yellow;
-	else
-		drawColor = FColor::Green;
-		
-	
-	
-	DrawDebugVisibilityLine(angleDegree+offsetAngle, searchDistance, drawColor);
-
-	DrawDebugVisibilityLine(-angleDegree+offsetAngle, searchDistance, drawColor);
-	
-	DrawDebugVisibilityLine(offsetAngle, searchDistance, FColor::Blue);
-}
-
-void ACoverPlace::DrawDebugVisibilityLine(float angleDegree, float Distance, FColor color)
-{
-	float angleRadians = FMath::DegreesToRadians(angleDegree);
-	FVector endPoint =GetActorLocation() + FVector(UKismetMathLibrary::Cos(angleRadians),UKismetMathLibrary::Sin(angleRadians),0)* Distance;
-	DrawDebugLine(
-			GetWorld(),
-			GetActorLocation(),
-			endPoint,
-			color,
-			false, .1f, 0,
-			3
-		);
-}
-
-
-void ACoverPlace::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
 void ACoverPlace::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -78,4 +23,74 @@ void ACoverPlace::Tick(float DeltaTime)
 	if(drawRight)
 		DrawDebugVisibilityCone(EDirection::RIGHT_DIRECTION, 30, 1000, coverRight);
 }
+
+void ACoverPlace::GetAllValiableTargets()
+{
+	//take all actors
+	//fiter them by max and min distance
+	FilterTargetsByDistance();
+	//filter them by angles
+	FilterTargetsByAngles();
+
+	//return targets
+}
+
+void ACoverPlace::FilterTargetsByDistance()
+{
+}
+
+void ACoverPlace::FilterTargetsByAngles()
+{
+}
+
+void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered)
+{
+	float drawAngle = 0;
+	switch (directionToDraw)
+	{
+	case EDirection::UP_DIRECTION:
+		drawAngle = FMath::DegreesToRadians(90);
+		break;
+	case EDirection::DOWN_DIRECTION:
+		drawAngle = FMath::DegreesToRadians(-90);
+		break;
+	case EDirection::LEFT_DIRECTION:
+		drawAngle = FMath::DegreesToRadians(180);
+		break;
+	case EDirection::RIGHT_DIRECTION:
+		//default
+		break;
+	default: ;
+	}
+	FColor drawColor;
+	if(isCovered)
+		drawColor = FColor::Yellow;
+	else
+		drawColor = FColor::Green;
+
+	//drawAngle += forwardAngle;
+	DrawDebugVisibilityLine(drawAngle, searchDistance, FColor::Blue);
+	
+	visibilityHalfAngle = FMath::DegreesToRadians(visibilityHalfAngle);
+	
+	DrawDebugVisibilityLine(drawAngle+visibilityHalfAngle, searchDistance, drawColor);
+
+	DrawDebugVisibilityLine(drawAngle-visibilityHalfAngle, searchDistance, drawColor);
+	
+}
+
+void ACoverPlace::DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color)
+{
+	FVector endPoint =GetActorLocation() +GetActorRotation().RotateVector(FVector(UKismetMathLibrary::Cos(drawAngle),UKismetMathLibrary::Sin(drawAngle),0))* Distance;
+	DrawDebugLine(
+			GetWorld(),
+			GetActorLocation(),
+			endPoint,
+			color,
+			false, .1f, 0,
+			3
+		);
+}
+
+
 
