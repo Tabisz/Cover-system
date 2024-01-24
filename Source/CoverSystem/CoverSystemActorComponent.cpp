@@ -1,16 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "CoverSystemActorComponent.h"
 
-// Sets default values for this component's properties
+#include "CoverSystemGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+
 UCoverSystemActorComponent::UCoverSystemActorComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	auto myActor = GetOwner();
+	if(myActor)
+		myActor->Tags.Add(FName("Character"));// move to some sort of global variable
+	
 }
 
 
@@ -18,9 +20,20 @@ UCoverSystemActorComponent::UCoverSystemActorComponent()
 void UCoverSystemActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
+	CoverSystemController = GetCoverSystemController();
+	if(!CoverSystemController)
+		return;
+	CoverSystemController->RegisterNewActor(this);
 	
+}
+
+ACoverSystemController* UCoverSystemActorComponent::GetCoverSystemController()
+{
+	UCoverSystemGameInstance* GI = Cast<UCoverSystemGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if(GI)
+		return Cast<ACoverSystemController>(GI->CoverSystemController.Get());
+	else
+		return nullptr;
 }
 
 

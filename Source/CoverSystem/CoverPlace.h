@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ArrowComponent.h"
+#include "CoverSystemActorComponent.h"
 #include "GameFramework/Actor.h"
 #include "CoverPlace.generated.h"
 
@@ -18,6 +18,7 @@ enum class EDirection : uint8
 
 ENUM_CLASS_FLAGS(EDirection);
 
+class ACoverSystemController;
 
 UCLASS()
 class COVERSYSTEM_API ACoverPlace : public AActor
@@ -27,14 +28,22 @@ class COVERSYSTEM_API ACoverPlace : public AActor
 public:	
 	ACoverPlace();
 
+	UPROPERTY()
+	ACoverSystemController* CoverSystemController;
+
+	
+
+	ACoverSystemController* GetCoverSystemController();
+
+	
 	UFUNCTION(BlueprintCallable)
-	void GetAllValiableTargets();
+	TArray<UCoverSystemActorComponent*> GetAllValidTargets();
 
 	UFUNCTION(BlueprintCallable)
-	void FilterTargetsByDistance();
+	void FilterTargetsByDistance(TArray<UCoverSystemActorComponent*>& actors);
 
 	UFUNCTION(BlueprintCallable)
-	void FilterTargetsByAngles();
+	void FilterTargetsByAngles(TArray<UCoverSystemActorComponent*>& actors);
 	
 	
 	
@@ -47,6 +56,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Debug")
 	void DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color);
 	
+	void DrawDebugLineBetween(const FVector end,const FColor color) const;
+
 	UPROPERTY(EditAnywhere, Category="Debug")
 	bool drawRight = true;
 	UPROPERTY(EditAnywhere, Category="Debug")
@@ -66,7 +77,9 @@ public:
 	bool coverDown;
 
 
-public:	
+public:
+	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaTime) override;
 
 };

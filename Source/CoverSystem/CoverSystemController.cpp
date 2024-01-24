@@ -1,49 +1,49 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CoverPlaceController.h"
+#include "CoverSystemController.h"
 
 // Sets default values
-ACoverPlaceController::ACoverPlaceController()
+ACoverSystemController::ACoverSystemController()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-void ACoverPlaceController::RegisterNewCover(ACoverPlace* newCover)
+void ACoverSystemController::RegisterNewCover(ACoverPlace* newCover)
 {
 	if(newCover)
 		CoverPlaces.AddUnique(newCover);
 }
 
-void ACoverPlaceController::UnregisterCover(ACoverPlace* Cover)
+void ACoverSystemController::UnregisterCover(ACoverPlace* Cover)
 {
 	if(Cover)
 		CoverPlaces.Remove(Cover);
 }
 
-void ACoverPlaceController::RegisterNewActor(UCoverSystemActorComponent* newActor)
+void ACoverSystemController::RegisterNewActor(UCoverSystemActorComponent* newActor)
 {
 	if(newActor)
 		CoverActors.AddUnique(newActor);
 }
 
-void ACoverPlaceController::UnregisterActor(UCoverSystemActorComponent* Actor)
+void ACoverSystemController::UnregisterActor(UCoverSystemActorComponent* Actor)
 {
 	if(Actor)
 		CoverActors.Remove(Actor);
 }
 
 // Called when the game starts or when spawned
-void ACoverPlaceController::BeginPlay()
+void ACoverSystemController::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ACoverPlaceController::Tick(float DeltaTime)
+void ACoverSystemController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

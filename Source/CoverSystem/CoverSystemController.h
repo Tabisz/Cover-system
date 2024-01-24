@@ -6,21 +6,22 @@
 #include "CoverPlace.h"
 #include "CoverSystemActorComponent.h"
 #include "GameFramework/Actor.h"
-#include "CoverPlaceController.generated.h"
+#include "CoverSystemController.generated.h"
 
 UCLASS()
-class COVERSYSTEM_API ACoverPlaceController : public AActor
+class COVERSYSTEM_API ACoverSystemController : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ACoverPlaceController();
-private:
+	ACoverSystemController();
+	
+	UPROPERTY(BlueprintReadOnly)
 	TArray<ACoverPlace*> CoverPlaces;
+	UPROPERTY(BlueprintReadOnly)
 	TArray<UCoverSystemActorComponent*> CoverActors;
-
-public:
+	
 	UFUNCTION(BlueprintCallable)
 	void RegisterNewCover(ACoverPlace* newCover);
 	UFUNCTION(BlueprintCallable)
