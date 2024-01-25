@@ -54,6 +54,15 @@ void ACoverPlace::Tick(float DeltaTime)
 	
 }
 
+void ACoverPlace::ChangeCoverState(ECoverPlaceState newState)
+{
+	if(myState == newState) return;
+
+	myState = newState;
+	//call event state change
+		
+}
+
 ACoverSystemController* ACoverPlace::GetCoverSystemController()
 {
 		UCoverSystemGameInstance* GI = Cast<UCoverSystemGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
@@ -132,21 +141,29 @@ void ACoverPlace::AnalyseTargetsByAngle(TArray<UTargetInfo*>& actors)
 		{
 			actors[i]->isInVisibilityRange = true;
 			actors[i]->DirectionToBeVisibleIn = EDirection::FORWARD_DIRECTION;
+			if(coverForward)
+				actors[i]->isFromCoveredSide = true;
 		}
 		else if(a >= 90-halfVisibility && a <= 90+halfVisibility)
 		{
 			actors[i]->isInVisibilityRange = true;
 			actors[i]->DirectionToBeVisibleIn = EDirection::RIGHT_DIRECTION;
+			if(coverRight)
+				actors[i]->isFromCoveredSide = true;
 		}
 		else if(a >= 180-halfVisibility && a <= 180+halfVisibility)
 		{
 			actors[i]->isInVisibilityRange = true;
 			actors[i]->DirectionToBeVisibleIn = EDirection::BACKWARD_DIRECTION;
+			if(coverBackward)
+				actors[i]->isFromCoveredSide = true;
 		}
 		else if(a >= 270-halfVisibility && a <= 270+halfVisibility)
 		{
 			actors[i]->isInVisibilityRange = true;
 			actors[i]->DirectionToBeVisibleIn = EDirection::LEFT_DIRECTION;
+			if(coverLeft)
+				actors[i]->isFromCoveredSide = true;
 		}
 		
 	}

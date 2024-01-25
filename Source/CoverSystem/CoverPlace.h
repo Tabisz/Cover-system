@@ -7,13 +7,21 @@
 #include "GameFramework/Actor.h"
 #include "CoverPlace.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class EDirection : uint8
 {
 	BACKWARD_DIRECTION,  
 	LEFT_DIRECTION,
 	FORWARD_DIRECTION,
 	RIGHT_DIRECTION
+};
+
+UENUM(BlueprintType)
+enum class ECoverPlaceState : uint8
+{
+	FREE,  
+	REGISTERED,
+	OCCUPIED
 };
 
 UCLASS()
@@ -63,6 +71,11 @@ public:
 	UPROPERTY()
 	ACoverSystemController* CoverSystemController;
 
+	UPROPERTY(BlueprintReadWrite)
+	ECoverPlaceState myState;
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeCoverState(ECoverPlaceState newState);
 	
 
 	ACoverSystemController* GetCoverSystemController();

@@ -12,21 +12,18 @@ class COVERSYSTEM_API ACoverSystemCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(BlueprintReadOnly)
 	UCoverSystemActorComponent* CoverSystemActorComponent;
 
-public:
-	// Sets default values for this character's properties
 	ACoverSystemCharacter();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };

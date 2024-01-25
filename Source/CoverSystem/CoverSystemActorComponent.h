@@ -19,7 +19,7 @@ public:
 	// Sets default values for this component's properties
 	UCoverSystemActorComponent();
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	ACoverSystemController* CoverSystemController;
 
 protected:

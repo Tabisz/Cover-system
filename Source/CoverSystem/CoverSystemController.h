@@ -32,6 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UnregisterActor(UCoverSystemActorComponent* Actor);
 
+
+	UFUNCTION(BlueprintCallable)
+	ACoverPlace* GetBestCoverPlace(UCoverSystemActorComponent* ActorRequesting);
+	UFUNCTION(BlueprintCallable)
+	ACoverPlace* GetRandomCoverPlace(UCoverSystemActorComponent* ActorRequesting);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
