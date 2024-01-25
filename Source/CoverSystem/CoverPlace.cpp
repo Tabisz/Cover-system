@@ -41,12 +41,12 @@ void ACoverPlace::Tick(float DeltaTime)
 		
 	}
 	
-	if(drawUp)
-		DrawDebugVisibilityCone(EDirection::FORWARD_DIRECTION, 30, 1000, coverUp, targetU);
+	if(drawForward)
+		DrawDebugVisibilityCone(EDirection::FORWARD_DIRECTION, 30, 1000, coverBackward, targetU);
 	if(drawLeft)
 		DrawDebugVisibilityCone(EDirection::LEFT_DIRECTION, 30, 1000, coverLeft, targetL);
-	if(drawDown)
-		DrawDebugVisibilityCone(EDirection::BACKWARD_DIRECTION, 30, 1000, coverDown, targetD);
+	if(drawBackward)
+		DrawDebugVisibilityCone(EDirection::BACKWARD_DIRECTION, 30, 1000, coverBackward, targetD);
 	if(drawRight)
 		DrawDebugVisibilityCone(EDirection::RIGHT_DIRECTION, 30, 1000, coverRight, targetR);
 
