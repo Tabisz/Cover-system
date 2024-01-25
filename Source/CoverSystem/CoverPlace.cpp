@@ -26,21 +26,32 @@ void ACoverPlace::BeginPlay()
 void ACoverPlace::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	if(drawUp)
-		DrawDebugVisibilityCone(EDirection::UP_DIRECTION, 30, 1000, coverUp);
-	if(drawLeft)
-		DrawDebugVisibilityCone(EDirection::LEFT_DIRECTION, 30, 1000, coverLeft);
-	if(drawDown)
-		DrawDebugVisibilityCone(EDirection::DOWN_DIRECTION, 30, 1000, coverDown);
-	if(drawRight)
-		DrawDebugVisibilityCone(EDirection::RIGHT_DIRECTION, 30, 1000, coverRight);
 
 	auto targets = GetAllValidTargets();
+
+	bool targetU,targetL,targetD,targetR;
 	for (auto target : targets)
 	{
-		DrawDebugLineBetween(target->GetOwner()->GetActorLocation(),FColor::Red);
+		DrawDebugLineBetween(target->coverSystemComponent->GetOwner()->GetActorLocation(),FColor::Red);
+			targetU = target->DirectionToBeVisibleIn == EDirection::FORWARD_DIRECTION;
+		targetD = target->DirectionToBeVisibleIn == EDirection::BACKWARD_DIRECTION;
+		targetL = target->DirectionToBeVisibleIn == EDirection::LEFT_DIRECTION;
+		targetR = target->DirectionToBeVisibleIn == EDirection::RIGHT_DIRECTION;
+
+		
 	}
+	
+	if(drawUp)
+		DrawDebugVisibilityCone(EDirection::FORWARD_DIRECTION, 30, 1000, coverUp, targetU);
+	if(drawLeft)
+		DrawDebugVisibilityCone(EDirection::LEFT_DIRECTION, 30, 1000, coverLeft, targetL);
+	if(drawDown)
+		DrawDebugVisibilityCone(EDirection::BACKWARD_DIRECTION, 30, 1000, coverDown, targetD);
+	if(drawRight)
+		DrawDebugVisibilityCone(EDirection::RIGHT_DIRECTION, 30, 1000, coverRight, targetR);
+
+	
+	
 }
 
 ACoverSystemController* ACoverPlace::GetCoverSystemController()
@@ -52,52 +63,111 @@ ACoverSystemController* ACoverPlace::GetCoverSystemController()
 		return nullptr;
 }
 
-TArray<UCoverSystemActorComponent*> ACoverPlace::GetAllValidTargets()
+TArray<UTargetInfo*> ACoverPlace::GetAllValidTargets()
 {
-		TArray<UCoverSystemActorComponent*> localCoverActors;
-	if(!CoverSystemController) return localCoverActors;
-	//take all actors
-	localCoverActors = CoverSystemController->CoverActors;
-	//fiter them by max and min distance
-	FilterTargetsByDistance(localCoverActors);
+	TArray<UTargetInfo*> targetsInfo = TArray<UTargetInfo*>();
+	if(!CoverSystemController)
+		return targetsInfo;
+	//create target info for all actors
+	for (auto coverActor : CoverSystemController->CoverActors)
+	{
+		if(!coverActor)
+			continue;
+		UTargetInfo* info;
+		info = NewObject<UTargetInfo>();
+		info->coverSystemComponent = coverActor;
+		info->distance = CalculateDistance(coverActor);
+		info->angle = CalculateAngle(coverActor);
+		targetsInfo.Add(info);
+	}
+	AnalyseTargetsByDistance(targetsInfo);
+	AnalyseTargetsByAngle(targetsInfo);
 
-	return localCoverActors;
+	return targetsInfo;
 }
 
-void ACoverPlace::FilterTargetsByDistance(TArray<UCoverSystemActorComponent*>& actors)
+float ACoverPlace::CalculateDistance(UCoverSystemActorComponent* CoverSystemActorComponent)
 {
-	FVector myLocation = GetActorLocation();
-	FVector otherLocation;
-	float distance;
+	return FVector::Distance( GetActorLocation(),CoverSystemActorComponent->GetOwner()->GetActorLocation());
+}
+
+float ACoverPlace::CalculateAngle(UCoverSystemActorComponent* CoverSystemActorComponent)
+{
+	FVector directionToTarget = CoverSystemActorComponent->GetOwner()->GetActorLocation() - GetActorLocation();
+	directionToTarget.Normalize(.1);
+	
+	float forwardAngle = FVector::DotProduct(GetActorForwardVector(),directionToTarget);
+	forwardAngle = UKismetMathLibrary::DegAcos(forwardAngle);
+	
+	float rightAngle = FVector::DotProduct(GetActorRightVector(),directionToTarget);
+	rightAngle = UKismetMathLibrary::DegAcos(rightAngle);
+	if(rightAngle<=90)
+		return forwardAngle;
+	else
+		return 360 - forwardAngle;
+}
+
+void ACoverPlace::AnalyseTargetsByDistance(TArray<UTargetInfo*>& actors)
+{
 	for (int i = actors.Num() - 1; i >= 0; i--)
 	{
-		otherLocation = actors[i]->GetOwner()->GetActorLocation();
-		distance = FVector::Distance(myLocation,otherLocation);
-		if(distance<100 || distance>2000)
-			actors.RemoveAt(i);
+		if(actors[i]->distance>2000)//set max distance as global variable
+		{
+			actors.RemoveAt(i);		//remove actor that is too far away
+			continue;			
+		}
+		if(actors[i]->distance<100)//set min distance as global variable
+			actors[i]->isTooClose;
 	}
 }
 
-void ACoverPlace::FilterTargetsByAngles(TArray<UCoverSystemActorComponent*>& actors)
+void ACoverPlace::AnalyseTargetsByAngle(TArray<UTargetInfo*>& actors)
 {
-	//TODO
+	float halfVisibility = 30;
+	for (int i = actors.Num() - 1; i >= 0; i--)
+	{
+		float a = actors[i]->angle;
+
+		if(a >= 360-halfVisibility || a <= halfVisibility)
+		{
+			actors[i]->isInVisibilityRange = true;
+			actors[i]->DirectionToBeVisibleIn = EDirection::FORWARD_DIRECTION;
+		}
+		else if(a >= 90-halfVisibility && a <= 90+halfVisibility)
+		{
+			actors[i]->isInVisibilityRange = true;
+			actors[i]->DirectionToBeVisibleIn = EDirection::RIGHT_DIRECTION;
+		}
+		else if(a >= 180-halfVisibility && a <= 180+halfVisibility)
+		{
+			actors[i]->isInVisibilityRange = true;
+			actors[i]->DirectionToBeVisibleIn = EDirection::BACKWARD_DIRECTION;
+		}
+		else if(a >= 270-halfVisibility && a <= 270+halfVisibility)
+		{
+			actors[i]->isInVisibilityRange = true;
+			actors[i]->DirectionToBeVisibleIn = EDirection::LEFT_DIRECTION;
+		}
+		
+	}
 }
 
-void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered)
+void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered, bool discoveredEnemy)
 {
 	float drawAngle = 0;
 	switch (directionToDraw)
 	{
-	case EDirection::UP_DIRECTION:
-		drawAngle = FMath::DegreesToRadians(90);
+	case EDirection::FORWARD_DIRECTION:
 		break;
-	case EDirection::DOWN_DIRECTION:
-		drawAngle = FMath::DegreesToRadians(-90);
-		break;
-	case EDirection::LEFT_DIRECTION:
+	case EDirection::BACKWARD_DIRECTION:
 		drawAngle = FMath::DegreesToRadians(180);
 		break;
+	case EDirection::LEFT_DIRECTION:
+		drawAngle = FMath::DegreesToRadians(-90);
+		break;
 	case EDirection::RIGHT_DIRECTION:
+		drawAngle = FMath::DegreesToRadians(90);
+		
 		//default
 		break;
 	default: ;
@@ -105,6 +175,8 @@ void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float visi
 	FColor drawColor;
 	if(isCovered)
 		drawColor = FColor::Yellow;
+	else if(discoveredEnemy)
+		drawColor = FColor::Red;
 	else
 		drawColor = FColor::Green;
 

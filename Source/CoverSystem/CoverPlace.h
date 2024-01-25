@@ -10,11 +10,43 @@
 UENUM()
 enum class EDirection : uint8
 {
-	DOWN_DIRECTION,  
+	BACKWARD_DIRECTION,  
 	LEFT_DIRECTION,
-	UP_DIRECTION,
+	FORWARD_DIRECTION,
 	RIGHT_DIRECTION
 };
+
+UCLASS()
+class COVERSYSTEM_API UTargetInfo : public UObject
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+	UCoverSystemActorComponent* coverSystemComponent;
+	
+	UPROPERTY()
+	float angle;
+
+	UPROPERTY()
+	float distance;
+
+	UPROPERTY()
+	EDirection DirectionToBeVisibleIn;
+
+	UPROPERTY()
+	bool isTooClose;
+
+	UPROPERTY()
+	bool isInVisibilityRange;
+
+	UPROPERTY()
+	bool isAbleToSeeYou;
+	
+	UPROPERTY()
+	bool isFromCoveredSide;
+	
+};
+
 
 ENUM_CLASS_FLAGS(EDirection);
 
@@ -37,13 +69,15 @@ public:
 
 	
 	UFUNCTION(BlueprintCallable)
-	TArray<UCoverSystemActorComponent*> GetAllValidTargets();
+	TArray<UTargetInfo*> GetAllValidTargets();
+	float CalculateDistance(UCoverSystemActorComponent* CoverSystemActorComponent);
+
+	float CalculateAngle(UCoverSystemActorComponent* CoverSystemActorComponent);
+	UFUNCTION(BlueprintCallable)
+	void AnalyseTargetsByDistance(TArray<UTargetInfo*>& actors);
 
 	UFUNCTION(BlueprintCallable)
-	void FilterTargetsByDistance(TArray<UCoverSystemActorComponent*>& actors);
-
-	UFUNCTION(BlueprintCallable)
-	void FilterTargetsByAngles(TArray<UCoverSystemActorComponent*>& actors);
+	void AnalyseTargetsByAngle(TArray<UTargetInfo*>& actors);
 	
 	
 	
@@ -51,7 +85,7 @@ public:
 	// void DrawDebugLineBetween(FVector start, FVector End, FColor color);
 	
 	UFUNCTION(BlueprintCallable, Category="Debug")
-	void DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered);
+	void DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered, bool discoveredEnemy);
 	
 	UFUNCTION(BlueprintCallable, Category="Debug")
 	void DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color);
@@ -63,18 +97,18 @@ public:
 	UPROPERTY(EditAnywhere, Category="Debug")
 	bool drawLeft;
 	UPROPERTY(EditAnywhere, Category="Debug")
-	bool drawUp;
+	bool drawForward;
 	UPROPERTY(EditAnywhere, Category="Debug")
-	bool drawDown;
+	bool drawBackward;
 
 	UPROPERTY(EditAnywhere, Category="Cover")
 	bool coverRight = true;
 	UPROPERTY(EditAnywhere, Category="Cover")
 	bool coverLeft;
 	UPROPERTY(EditAnywhere, Category="Cover")
-	bool coverUp;
+	bool coverForward;
 	UPROPERTY(EditAnywhere, Category="Cover")
-	bool coverDown;
+	bool coverBackward;
 
 
 public:
