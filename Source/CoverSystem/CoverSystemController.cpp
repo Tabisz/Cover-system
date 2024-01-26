@@ -39,8 +39,47 @@ ACoverPlace* ACoverSystemController::GetBestCoverPlace(UCoverSystemActorComponen
 {
 	if(CoverPlaces.Num()== 0)
 		return nullptr;
+
+	auto coverPlaceWithBestScore = CoverPlaces[0];
+	int bestScore = -999999999;
+	for (auto place : CoverPlaces)
+	{
+		if(place == nullptr) continue;
+		if(place->myState != ECoverPlaceState::FREE) continue;
+		int currentCoverScore = 0;
+		
+		auto TargetInfos = place->GetAllValidTargets();
+		for (auto TargetInfo : TargetInfos)
+		{
+			if(TargetInfo->coverSystemComponent == ActorRequesting) continue;//ignore self
+			if(TargetInfo->isTooClose)
+				continue;			//this target doesnt affect this place in any way
+			
+			if(TargetInfo->isInVisibilityRange)
+			{
+				currentCoverScore+=100/TargetInfo->distance;		//good position because you can shoot others
+																	//closer -> better
+			}
+			
+			if(TargetInfo->isAbleToSeeYou)
+			{
+				if(TargetInfo->isFromCoveredSide)
+					currentCoverScore-=5;	//it is bad that someone can see you but you are in cover
+				else
+					currentCoverScore-=10; //or not
+			}
+		}
+
+		currentCoverScore-= FVector::Distance(ActorRequesting->GetOwner()->GetActorLocation(),
+											  place->GetActorLocation())/100; //more distance is worse
+		if(currentCoverScore>bestScore)
+		{
+			bestScore = currentCoverScore;
+			coverPlaceWithBestScore = place;
+		}
+	}
 	
-	return CoverPlaces[1];
+	return coverPlaceWithBestScore;
 }
 
 ACoverPlace* ACoverSystemController::GetRandomCoverPlace(UCoverSystemActorComponent* ActorRequesting)

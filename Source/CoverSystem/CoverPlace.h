@@ -68,21 +68,27 @@ class COVERSYSTEM_API ACoverPlace : public AActor
 public:	
 	ACoverPlace();
 
-	UPROPERTY()
+		
+	virtual void BeginPlay() override;
+	
+	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(EditAnywhere)
 	ACoverSystemController* CoverSystemController;
 
 	UPROPERTY(BlueprintReadWrite)
 	ECoverPlaceState myState;
 
+	
 	UFUNCTION(BlueprintCallable)
 	void ChangeCoverState(ECoverPlaceState newState);
 	
-
 	ACoverSystemController* GetCoverSystemController();
 
 	
 	UFUNCTION(BlueprintCallable)
 	TArray<UTargetInfo*> GetAllValidTargets();
+	
 	float CalculateDistance(UCoverSystemActorComponent* CoverSystemActorComponent);
 
 	float CalculateAngle(UCoverSystemActorComponent* CoverSystemActorComponent);
@@ -90,29 +96,16 @@ public:
 	void AnalyseTargetsByDistance(TArray<UTargetInfo*>& actors);
 
 	UFUNCTION(BlueprintCallable)
-	void AnalyseTargetsByAngle(TArray<UTargetInfo*>& actors);
+	void AnalyseTargetsByAngle(TArray<UTargetInfo*>& targets);
 	
-	
-	
-	// UFUNCTION(BlueprintCallable, Category="Debug")
-	// void DrawDebugLineBetween(FVector start, FVector End, FColor color);
-	
-	UFUNCTION(BlueprintCallable, Category="Debug")
-	void DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered, bool discoveredEnemy);
-	
-	UFUNCTION(BlueprintCallable, Category="Debug")
-	void DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color);
-	
-	void DrawDebugLineBetween(const FVector end,const FColor color) const;
-
-	UPROPERTY(EditAnywhere, Category="Debug")
-	bool drawRight = true;
-	UPROPERTY(EditAnywhere, Category="Debug")
-	bool drawLeft;
-	UPROPERTY(EditAnywhere, Category="Debug")
-	bool drawForward;
-	UPROPERTY(EditAnywhere, Category="Debug")
-	bool drawBackward;
+	UPROPERTY(EditAnywhere, Category="Cover")
+	bool visibilityRight = true;
+	UPROPERTY(EditAnywhere, Category="Cover")
+	bool visibilityLeft;
+	UPROPERTY(EditAnywhere, Category="Cover")
+	bool visibilityForward;
+	UPROPERTY(EditAnywhere, Category="Cover")
+	bool visibilityBackward;
 
 	UPROPERTY(EditAnywhere, Category="Cover")
 	bool coverRight = true;
@@ -124,9 +117,27 @@ public:
 	bool coverBackward;
 
 
-public:
-	virtual void BeginPlay() override;
 	
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditAnywhere, Category="Debug")
+	bool enableDebug;
+
+	/** Allows Tick To happen in the editor viewport*/
+	virtual bool ShouldTickIfViewportsOnly() const override;
+
+	/** Tick that runs ONLY in the editor viewport.*/
+	UFUNCTION()
+	void BlueprintEditorTick(float DeltaTime);
+
+	
+	UFUNCTION(Category="Debug")
+	void DrawDebug();
+	
+	UFUNCTION(BlueprintCallable, Category="Debug")
+	void DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered, bool discoveredEnemy);
+	
+	UFUNCTION(BlueprintCallable, Category="Debug")
+	void DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color);
+	
+	void DrawDebugLineBetween(const FVector end,const FColor color) const;
 
 };

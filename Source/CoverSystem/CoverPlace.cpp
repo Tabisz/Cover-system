@@ -25,33 +25,17 @@ void ACoverPlace::BeginPlay()
 
 void ACoverPlace::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
 
-	auto targets = GetAllValidTargets();
-
-	bool targetU,targetL,targetD,targetR;
-	for (auto target : targets)
+#if WITH_EDITOR
+	if (GetWorld() != nullptr && GetWorld()->WorldType == EWorldType::Editor)
 	{
-		DrawDebugLineBetween(target->coverSystemComponent->GetOwner()->GetActorLocation(),FColor::Red);
-			targetU = target->DirectionToBeVisibleIn == EDirection::FORWARD_DIRECTION;
-		targetD = target->DirectionToBeVisibleIn == EDirection::BACKWARD_DIRECTION;
-		targetL = target->DirectionToBeVisibleIn == EDirection::LEFT_DIRECTION;
-		targetR = target->DirectionToBeVisibleIn == EDirection::RIGHT_DIRECTION;
-
-		
+		BlueprintEditorTick(DeltaTime);
 	}
-	
-	if(drawForward)
-		DrawDebugVisibilityCone(EDirection::FORWARD_DIRECTION, 30, 1000, coverBackward, targetU);
-	if(drawLeft)
-		DrawDebugVisibilityCone(EDirection::LEFT_DIRECTION, 30, 1000, coverLeft, targetL);
-	if(drawBackward)
-		DrawDebugVisibilityCone(EDirection::BACKWARD_DIRECTION, 30, 1000, coverBackward, targetD);
-	if(drawRight)
-		DrawDebugVisibilityCone(EDirection::RIGHT_DIRECTION, 30, 1000, coverRight, targetR);
-
-	
-	
+	else
+#endif
+	{
+		Super::Tick(DeltaTime);
+	}
 }
 
 void ACoverPlace::ChangeCoverState(ECoverPlaceState newState)
@@ -130,43 +114,90 @@ void ACoverPlace::AnalyseTargetsByDistance(TArray<UTargetInfo*>& actors)
 	}
 }
 
-void ACoverPlace::AnalyseTargetsByAngle(TArray<UTargetInfo*>& actors)
+void ACoverPlace::AnalyseTargetsByAngle(TArray<UTargetInfo*>& targets)
 {
 	float halfVisibility = 30;
-	for (int i = actors.Num() - 1; i >= 0; i--)
+	for (int i = targets.Num() - 1; i >= 0; i--)
 	{
-		float a = actors[i]->angle;
+		float a = targets[i]->angle;
 
 		if(a >= 360-halfVisibility || a <= halfVisibility)
 		{
-			actors[i]->isInVisibilityRange = true;
-			actors[i]->DirectionToBeVisibleIn = EDirection::FORWARD_DIRECTION;
+			targets[i]->isInVisibilityRange = true;
+			targets[i]->DirectionToBeVisibleIn = EDirection::FORWARD_DIRECTION;
 			if(coverForward)
-				actors[i]->isFromCoveredSide = true;
+				targets[i]->isFromCoveredSide = true;
 		}
 		else if(a >= 90-halfVisibility && a <= 90+halfVisibility)
 		{
-			actors[i]->isInVisibilityRange = true;
-			actors[i]->DirectionToBeVisibleIn = EDirection::RIGHT_DIRECTION;
+			targets[i]->isInVisibilityRange = true;
+			targets[i]->DirectionToBeVisibleIn = EDirection::RIGHT_DIRECTION;
 			if(coverRight)
-				actors[i]->isFromCoveredSide = true;
+				targets[i]->isFromCoveredSide = true;
 		}
 		else if(a >= 180-halfVisibility && a <= 180+halfVisibility)
 		{
-			actors[i]->isInVisibilityRange = true;
-			actors[i]->DirectionToBeVisibleIn = EDirection::BACKWARD_DIRECTION;
+			targets[i]->isInVisibilityRange = true;
+			targets[i]->DirectionToBeVisibleIn = EDirection::BACKWARD_DIRECTION;
 			if(coverBackward)
-				actors[i]->isFromCoveredSide = true;
+				targets[i]->isFromCoveredSide = true;
 		}
 		else if(a >= 270-halfVisibility && a <= 270+halfVisibility)
 		{
-			actors[i]->isInVisibilityRange = true;
-			actors[i]->DirectionToBeVisibleIn = EDirection::LEFT_DIRECTION;
+			targets[i]->isInVisibilityRange = true;
+			targets[i]->DirectionToBeVisibleIn = EDirection::LEFT_DIRECTION;
 			if(coverLeft)
-				actors[i]->isFromCoveredSide = true;
+				targets[i]->isFromCoveredSide = true;
 		}
 		
 	}
+}
+/////////////// DEBUG
+
+
+// This ultimately is what controls whether or not it can even tick at all in the editor view port. 
+//But, it is EVERY view port so it still needs to be blocked from preview windows and junk.
+bool ACoverPlace::ShouldTickIfViewportsOnly() const
+{
+	if (GetWorld() != nullptr && GetWorld()->WorldType == EWorldType::Editor && enableDebug)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void ACoverPlace::BlueprintEditorTick(float DeltaTime)
+{
+	if(enableDebug)
+		DrawDebug();
+}
+
+void ACoverPlace::DrawDebug()
+{
+	auto targets = GetAllValidTargets();
+
+	bool targetU,targetL,targetD,targetR;
+	for (auto target : targets)
+	{
+		//DrawDebugLineBetween(target->coverSystemComponent->GetOwner()->GetActorLocation(),FColor::Red);
+		if(!target->isInVisibilityRange || target->isTooClose) continue;
+		
+		targetU = target->DirectionToBeVisibleIn == EDirection::FORWARD_DIRECTION;
+		targetD = target->DirectionToBeVisibleIn == EDirection::BACKWARD_DIRECTION;
+		targetL = target->DirectionToBeVisibleIn == EDirection::LEFT_DIRECTION;
+		targetR = target->DirectionToBeVisibleIn == EDirection::RIGHT_DIRECTION;
+	}
+		if(visibilityForward)
+			DrawDebugVisibilityCone(EDirection::FORWARD_DIRECTION, 30, 1000, coverForward, targetU);
+		if(visibilityLeft)
+			DrawDebugVisibilityCone(EDirection::LEFT_DIRECTION, 30, 1000, coverLeft, targetL);
+		if(visibilityBackward)
+			DrawDebugVisibilityCone(EDirection::BACKWARD_DIRECTION, 30, 1000, coverBackward, targetD);
+		if(visibilityRight)
+			DrawDebugVisibilityCone(EDirection::RIGHT_DIRECTION, 30, 1000, coverRight, targetR);
 }
 
 void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered, bool discoveredEnemy)
@@ -190,10 +221,10 @@ void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, float visi
 	default: ;
 	}
 	FColor drawColor;
-	if(isCovered)
-		drawColor = FColor::Yellow;
-	else if(discoveredEnemy)
+	if(discoveredEnemy)
 		drawColor = FColor::Red;
+	else if(isCovered)
+		drawColor = FColor::Yellow;
 	else
 		drawColor = FColor::Green;
 
