@@ -24,6 +24,7 @@ void UCoverSystemActorComponent::BeginPlay()
 	if(!CoverSystemController)
 		return;
 	CoverSystemController->RegisterNewActor(this);
+	OnRegisterCompleted.Broadcast();
 	
 }
 
@@ -34,6 +35,11 @@ ACoverSystemController* UCoverSystemActorComponent::GetCoverSystemController()
 		return Cast<ACoverSystemController>(GI->CoverSystemController.Get());
 	else
 		return nullptr;
+}
+
+TMap<FKey, FString> UCoverSystemActorComponent::GetAdditionalInfo()
+{
+	return TMap<FKey, FString>();
 }
 
 

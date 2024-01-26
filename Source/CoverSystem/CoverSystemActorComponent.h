@@ -7,8 +7,9 @@
 #include "CoverSystemActorComponent.generated.h"
 
 class ACoverSystemController;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInitDelegate);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class COVERSYSTEM_API UCoverSystemActorComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -19,6 +20,8 @@ public:
 	// Sets default values for this component's properties
 	UCoverSystemActorComponent();
 
+	FInitDelegate OnRegisterCompleted;
+
 	UPROPERTY(BlueprintReadOnly)
 	ACoverSystemController* CoverSystemController;
 
@@ -28,8 +31,13 @@ protected:
 
 	ACoverSystemController* GetCoverSystemController();
 
-public:	
-	// Called every frame
+	
+
+public:
+	
+	UFUNCTION(BlueprintPure)
+	TMap<FKey, FString> GetAdditionalInfo();
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 		

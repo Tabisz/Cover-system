@@ -7,19 +7,34 @@
 #include "GameFramework/Character.h"
 #include "CoverSystemCharacter.generated.h"
 
+
+UENUM(BlueprintType)
+enum class ETEAM : uint8
+{
+	RED,  
+	BLUE,
+};
 UCLASS()
 class COVERSYSTEM_API ACoverSystemCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadWrite)
 	UCoverSystemActorComponent* CoverSystemActorComponent;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	ETEAM myTeam;
+	
 
 	ACoverSystemCharacter();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCoverSystemRegisterCompleted();
+
 protected:
 	virtual void BeginPlay() override;
+	
 
 public:	
 	virtual void Tick(float DeltaTime) override;

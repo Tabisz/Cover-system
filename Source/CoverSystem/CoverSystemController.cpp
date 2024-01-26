@@ -52,6 +52,12 @@ ACoverPlace* ACoverSystemController::GetBestCoverPlace(UCoverSystemActorComponen
 		for (auto TargetInfo : TargetInfos)
 		{
 			if(TargetInfo->coverSystemComponent == ActorRequesting) continue;//ignore self
+
+			FString* team = TargetInfo->AdditionalInfoMap.Find("TEAM");
+
+			if(team == ActorRequesting->GetAdditionalInfo().Find("TEAM")) continue;
+				
+			
 			if(TargetInfo->isTooClose)
 				continue;			//this target doesnt affect this place in any way
 			

@@ -31,6 +31,9 @@ class COVERSYSTEM_API UTargetInfo : public UObject
 public:
 	UPROPERTY()
 	UCoverSystemActorComponent* coverSystemComponent;
+
+	UPROPERTY()
+	TMap<FKey, FString> AdditionalInfoMap;
 	
 	UPROPERTY()
 	float angle;

@@ -3,6 +3,8 @@
 
 #include "CoverSystemCharacter.h"
 
+#include "CoverSystemController.h"
+
 // Sets default values
 ACoverSystemCharacter::ACoverSystemCharacter()
 {
@@ -10,6 +12,7 @@ ACoverSystemCharacter::ACoverSystemCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CoverSystemActorComponent  = CreateDefaultSubobject<UCoverSystemActorComponent>(TEXT("CoverSystemComponent"));
+	CoverSystemActorComponent->OnRegisterCompleted.AddDynamic(this,&ACoverSystemCharacter::OnCoverSystemRegisterCompleted);
 
 }
 
