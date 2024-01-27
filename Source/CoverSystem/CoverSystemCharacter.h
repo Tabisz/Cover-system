@@ -31,7 +31,16 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCoverSystemRegisterCompleted();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void OnCoverSystemInfoRequested();
 
+	UFUNCTION(BlueprintCallable)
+	AActor* GetBestShootingTarget(); 
+
+	UFUNCTION(BlueprintCallable)
+	bool ShootAtTarget(AActor* target); 
+	
 protected:
 	virtual void BeginPlay() override;
 	

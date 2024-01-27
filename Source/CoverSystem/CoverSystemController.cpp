@@ -39,23 +39,29 @@ ACoverPlace* ACoverSystemController::GetBestCoverPlace(UCoverSystemActorComponen
 {
 	if(CoverPlaces.Num()== 0)
 		return nullptr;
-
+	
 	auto coverPlaceWithBestScore = CoverPlaces[0];
 	int bestScore = -999999999;
+
+	ActorRequesting->OnAdditionalInfoUpdateRequest.Broadcast();
+	
 	for (auto place : CoverPlaces)
 	{
 		if(place == nullptr) continue;
 		if(place->myState != ECoverPlaceState::FREE) continue;
+		float distanceToCover = FVector::Distance(ActorRequesting->GetOwner()->GetActorLocation(),
+											  place->GetActorLocation());
+		if(distanceToCover<100) continue;// if cover is too close ignore it
+		
 		int currentCoverScore = 0;
 		
 		auto TargetInfos = place->GetAllValidTargets();
 		for (auto TargetInfo : TargetInfos)
 		{
 			if(TargetInfo->coverSystemComponent == ActorRequesting) continue;//ignore self
-
+			
 			FString* team = TargetInfo->AdditionalInfoMap.Find("TEAM");
-
-			if(team == ActorRequesting->GetAdditionalInfo().Find("TEAM")) continue;
+			if(team == ActorRequesting->AdditionalInfo.Find("TEAM")) continue;
 				
 			
 			if(TargetInfo->isTooClose)
@@ -76,8 +82,8 @@ ACoverPlace* ACoverSystemController::GetBestCoverPlace(UCoverSystemActorComponen
 			}
 		}
 
-		currentCoverScore-= FVector::Distance(ActorRequesting->GetOwner()->GetActorLocation(),
-											  place->GetActorLocation())/100; //more distance is worse
+		currentCoverScore-= distanceToCover/100; //more distance is worse
+		
 		if(currentCoverScore>bestScore)
 		{
 			bestScore = currentCoverScore;

@@ -7,7 +7,9 @@
 #include "CoverSystemActorComponent.generated.h"
 
 class ACoverSystemController;
+class ACoverPlace;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInitDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestAdditionalInfo);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class COVERSYSTEM_API UCoverSystemActorComponent : public UActorComponent
@@ -21,9 +23,16 @@ public:
 	UCoverSystemActorComponent();
 
 	FInitDelegate OnRegisterCompleted;
+	FRequestAdditionalInfo OnAdditionalInfoUpdateRequest;
 
 	UPROPERTY(BlueprintReadOnly)
 	ACoverSystemController* CoverSystemController;
+
+	UPROPERTY(BlueprintReadWrite)
+	ACoverPlace* CurrentCoverPlace; 
+
+	UPROPERTY(BlueprintReadWrite)
+	TMap<FKey, FString> AdditionalInfo;
 
 protected:
 	// Called when the game starts
@@ -34,9 +43,6 @@ protected:
 	
 
 public:
-	
-	UFUNCTION(BlueprintPure)
-	TMap<FKey, FString> GetAdditionalInfo();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

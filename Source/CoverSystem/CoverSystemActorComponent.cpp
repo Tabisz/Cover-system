@@ -37,12 +37,6 @@ ACoverSystemController* UCoverSystemActorComponent::GetCoverSystemController()
 		return nullptr;
 }
 
-TMap<FKey, FString> UCoverSystemActorComponent::GetAdditionalInfo()
-{
-	return TMap<FKey, FString>();
-}
-
-
 // Called every frame
 void UCoverSystemActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

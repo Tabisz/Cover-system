@@ -86,7 +86,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeCoverState(ECoverPlaceState newState);
 	
-	ACoverSystemController* GetCoverSystemController();
+	ACoverSystemController* GetCoverSystemController() const;
 
 	
 	UFUNCTION(BlueprintCallable)
