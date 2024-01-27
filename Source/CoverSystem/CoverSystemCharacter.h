@@ -25,6 +25,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 	ETEAM myTeam;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Health;
 	
 
 	ACoverSystemCharacter();
@@ -39,7 +42,13 @@ public:
 	AActor* GetBestShootingTarget(); 
 
 	UFUNCTION(BlueprintCallable)
-	bool ShootAtTarget(AActor* target); 
+	void ShootAtTarget(AActor* target);
+
+	UFUNCTION(BlueprintCallable)
+	void ReceiveDamage(float amount);
+
+	UFUNCTION(BlueprintCallable)
+	void Die();
 	
 protected:
 	virtual void BeginPlay() override;

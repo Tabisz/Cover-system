@@ -32,9 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UnregisterActor(UCoverSystemActorComponent* Actor);
 
-
-	UFUNCTION(BlueprintCallable)
-	ACoverPlace* GetBestCoverPlace(UCoverSystemActorComponent* ActorRequesting);
+	
 	UFUNCTION(BlueprintCallable)
 	ACoverPlace* GetRandomCoverPlace(UCoverSystemActorComponent* ActorRequesting);
 

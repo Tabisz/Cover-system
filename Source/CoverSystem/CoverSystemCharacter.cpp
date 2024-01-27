@@ -10,7 +10,8 @@ ACoverSystemCharacter::ACoverSystemCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	Health = 100;
+	
 	CoverSystemActorComponent  = CreateDefaultSubobject<UCoverSystemActorComponent>(TEXT("CoverSystemComponent"));
 	CoverSystemActorComponent->OnRegisterCompleted.AddDynamic(this,&ACoverSystemCharacter::OnCoverSystemRegisterCompleted);
 	CoverSystemActorComponent->OnRegisterCompleted.AddDynamic(this,&ACoverSystemCharacter::OnCoverSystemInfoRequested);
@@ -49,13 +50,28 @@ AActor* ACoverSystemCharacter::GetBestShootingTarget()
 	return choosenActor;
 }
 
-bool ACoverSystemCharacter::ShootAtTarget(AActor* target)
+void ACoverSystemCharacter::ShootAtTarget(AActor* target)
 {
 	if(target)
 		if(GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Currently shooting at %s"),*GetDebugName(target)));
+	if(auto enemy = Cast<ACoverSystemCharacter>(target))
+		enemy->ReceiveDamage(30);
+	
+}
 
-	return true;
+void ACoverSystemCharacter::ReceiveDamage(float amount)
+{
+	Health -= amount;
+	if(Health<=0)
+		Die();
+}
+
+void ACoverSystemCharacter::Die()
+{
+	CoverSystemActorComponent->CoverSystemController->UnregisterActor(CoverSystemActorComponent);
+	CoverSystemActorComponent->CurrentCoverPlace->myState = ECoverPlaceState::FREE;
+	Destroy();
 }
 
 // Called when the game starts or when spawned

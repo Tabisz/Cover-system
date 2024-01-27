@@ -71,8 +71,10 @@ TArray<UTargetInfo*> ACoverPlace::GetAllValidTargets()
 		UTargetInfo* info;
 		info = NewObject<UTargetInfo>();
 		info->coverSystemComponent = coverActor;
+		
 		coverActor->OnAdditionalInfoUpdateRequest.Broadcast();
 		info->AdditionalInfoMap = coverActor->AdditionalInfo;
+		
 		info->distance = CalculateDistance(coverActor);
 		info->angle = CalculateAngle(coverActor);
 		targetsInfo.Add(info);

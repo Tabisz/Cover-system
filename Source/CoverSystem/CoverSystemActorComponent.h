@@ -34,11 +34,15 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	TMap<FKey, FString> AdditionalInfo;
 
+	UFUNCTION(BlueprintCallable)
+	ACoverPlace* GetBestCoverPlace();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	ACoverSystemController* GetCoverSystemController();
+	
 
 	
 
