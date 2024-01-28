@@ -1,5 +1,4 @@
-Zakazane zadanie rekrutacyjne
-
+Cover System
 System generowania osłon jest implementowane za pomocą trzech klas:
 
 - Cover system controller: odpowiada za zarządzanie kolekcją miejsc do schowania się i kolekcją postaci szukających takich miejsc. System wspiera dynamiczne dodawanie/usuwanie elementów systemu w czasie gameplayu.
