@@ -55,7 +55,9 @@ public:
 	
 	UPROPERTY()
 	bool isFromCoveredSide;
-	
+
+	UPROPERTY()
+	bool isVisionBlocked;
 };
 
 
@@ -76,11 +78,13 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 	
+
 	UPROPERTY(EditAnywhere)
 	ACoverSystemController* CoverSystemController;
 
 	UPROPERTY(BlueprintReadWrite)
 	ECoverPlaceState myState;
+	void ChangeState(ECoverPlaceState NewState);
 
 	
 	UFUNCTION(BlueprintCallable)
@@ -95,11 +99,12 @@ public:
 	float CalculateDistance(UCoverSystemActorComponent* CoverSystemActorComponent);
 
 	float CalculateAngle(UCoverSystemActorComponent* CoverSystemActorComponent);
-	UFUNCTION(BlueprintCallable)
+	
 	void AnalyseTargetsByDistance(TArray<UTargetInfo*>& actors);
 
-	UFUNCTION(BlueprintCallable)
 	void AnalyseTargetsByAngle(TArray<UTargetInfo*>& targets);
+
+	void AnalyseBlockingVisibility(TArray<UTargetInfo*>& targets);
 	
 	UPROPERTY(EditAnywhere, Category="Cover")
 	bool visibilityRight = true;

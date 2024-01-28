@@ -3,6 +3,7 @@
 #include "CoverSystemActorComponent.h"
 
 #include "CoverSystemGameInstance.h"
+#include "DSP/LFO.h"
 #include "Kismet/GameplayStatics.h"
 
 UCoverSystemActorComponent::UCoverSystemActorComponent()
@@ -26,6 +27,32 @@ void UCoverSystemActorComponent::BeginPlay()
 	CoverSystemController->RegisterNewActor(this);
 	OnRegisterCompleted.Broadcast();
 	
+}
+
+void UCoverSystemActorComponent::FreeUpCoverPlace()
+{
+	if(OccupiedCoverPlace)
+	{
+		OccupiedCoverPlace->ChangeState(ECoverPlaceState::FREE);
+		OccupiedCoverPlace = nullptr;
+	}
+}
+
+bool UCoverSystemActorComponent::RegisterCoverPlace(ACoverPlace* coverPlace)
+{
+	if(coverPlace->myState != ECoverPlaceState::FREE) return false;
+	coverPlace->ChangeState(ECoverPlaceState::REGISTERED);
+	RegisteredCoverPlace = coverPlace;
+	return true;
+}
+
+bool UCoverSystemActorComponent::OccupyRegisteredCoverPlace()
+{
+	if(RegisteredCoverPlace == nullptr || RegisteredCoverPlace->myState != ECoverPlaceState::REGISTERED) return false;
+	OccupiedCoverPlace = RegisteredCoverPlace;
+	RegisteredCoverPlace = nullptr;
+	OccupiedCoverPlace->ChangeState(ECoverPlaceState::OCCUPIED);
+	return true;
 }
 
 ACoverPlace* UCoverSystemActorComponent::GetBestCoverPlace()
@@ -59,12 +86,13 @@ ACoverPlace* UCoverSystemActorComponent::GetBestCoverPlace()
 			
 			if(TargetInfo->isTooClose)
 				continue;			//this target doesnt affect this place in any way
+
+			if(TargetInfo->isVisionBlocked)	//ignoreTargetIfVisionIsBlocked
+				continue;
 			
 			if(TargetInfo->isInVisibilityRange)
-			{
 				currentCoverScore+=100/TargetInfo->distance;		//good position because you can shoot others
-				//closer -> better
-			}
+																	//closer -> better
 			
 			if(TargetInfo->isAbleToSeeYou)
 			{
@@ -76,6 +104,8 @@ ACoverPlace* UCoverSystemActorComponent::GetBestCoverPlace()
 		}
 
 		currentCoverScore-= distanceToCover/100; //more distance is worse
+
+		
 		
 		if(currentCoverScore>bestScore)
 		{

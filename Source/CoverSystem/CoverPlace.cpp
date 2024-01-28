@@ -40,6 +40,12 @@ void ACoverPlace::Tick(float DeltaTime)
 	}
 }
 
+void ACoverPlace::ChangeState(ECoverPlaceState NewState)
+{
+	myState = NewState;
+	CoverSystemController->OnCoverPlaceStateChanged.Broadcast(this,myState);
+}
+
 void ACoverPlace::ChangeCoverState(ECoverPlaceState newState)
 {
 	if(myState == newState) return;
@@ -80,7 +86,10 @@ TArray<UTargetInfo*> ACoverPlace::GetAllValidTargets()
 		targetsInfo.Add(info);
 	}
 	AnalyseTargetsByDistance(targetsInfo);
+	
 	AnalyseTargetsByAngle(targetsInfo);
+
+	AnalyseBlockingVisibility(targetsInfo);
 
 	return targetsInfo;
 }
@@ -158,11 +167,21 @@ void ACoverPlace::AnalyseTargetsByAngle(TArray<UTargetInfo*>& targets)
 		
 	}
 }
+
+void ACoverPlace::AnalyseBlockingVisibility(TArray<UTargetInfo*>& targets)
+{
+	FHitResult hit;
+	for (int i = targets.Num() - 1; i >= 0; i--)
+	{
+		FCollisionQueryParams QueryParams;
+		bool actorHit = GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(),targets[i]->coverSystemComponent->GetOwner()->GetActorLocation(), ECC_WorldStatic, QueryParams,FCollisionResponseParams());
+
+		targets[i]->isVisionBlocked = actorHit;
+	}	
+}
+
 /////////////// DEBUG
 
-
-// This ultimately is what controls whether or not it can even tick at all in the editor view port. 
-//But, it is EVERY view port so it still needs to be blocked from preview windows and junk.
 bool ACoverPlace::ShouldTickIfViewportsOnly() const
 {
 	if (GetWorld() != nullptr && GetWorld()->WorldType == EWorldType::Editor && enableDebug)
@@ -191,7 +210,6 @@ void ACoverPlace::DrawDebug()
 
 	for (auto target : targets)
 	{
-		//DrawDebugLineBetween(target->coverSystemComponent->GetOwner()->GetActorLocation(),FColor::Red);
 		if(!target->isInVisibilityRange || target->isTooClose)continue;
 		
 		targetU = target->DirectionToBeVisibleIn == EDirection::FORWARD_DIRECTION;

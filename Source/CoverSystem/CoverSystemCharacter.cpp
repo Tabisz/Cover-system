@@ -4,6 +4,7 @@
 #include "CoverSystemCharacter.h"
 
 #include "CoverSystemController.h"
+#include "DSP/LFO.h"
 
 // Sets default values
 ACoverSystemCharacter::ACoverSystemCharacter()
@@ -28,9 +29,9 @@ void ACoverSystemCharacter::OnCoverSystemInfoRequested_Implementation()
 AActor* ACoverSystemCharacter::GetBestShootingTarget()
 {
 
-	if(!CoverSystemActorComponent || !CoverSystemActorComponent->CurrentCoverPlace) return nullptr;
-	if(CoverSystemActorComponent->CurrentCoverPlace->myState != ECoverPlaceState::OCCUPIED) return nullptr;
-	auto validTargets = CoverSystemActorComponent->CurrentCoverPlace->GetAllValidTargets();
+	if(!CoverSystemActorComponent || !CoverSystemActorComponent->OccupiedCoverPlace) return nullptr;
+	if(CoverSystemActorComponent->OccupiedCoverPlace->myState != ECoverPlaceState::OCCUPIED) return nullptr;
+	auto validTargets = CoverSystemActorComponent->OccupiedCoverPlace->GetAllValidTargets();
 	if(validTargets.Num()==0) return nullptr;
 
 	AActor* choosenActor = nullptr;
@@ -38,11 +39,14 @@ AActor* ACoverSystemCharacter::GetBestShootingTarget()
 	for (auto Target : validTargets)
 	{
 		if(Target->isTooClose) continue;
+		if(!Target->isInVisibilityRange) continue;
+		
 		CoverSystemActorComponent->OnAdditionalInfoUpdateRequest.Broadcast();
-
+		
 		FString* team = Target->AdditionalInfoMap.Find("TEAM");
 		if(team->Equals(*CoverSystemActorComponent->AdditionalInfo.Find("TEAM")))
 			continue;
+		
 		if(Target->distance<shortestTargetDistance)
 			choosenActor = Target->coverSystemComponent->GetOwner();
 	}
@@ -70,28 +74,11 @@ void ACoverSystemCharacter::ReceiveDamage(float amount)
 void ACoverSystemCharacter::Die()
 {
 	CoverSystemActorComponent->CoverSystemController->UnregisterActor(CoverSystemActorComponent);
-	CoverSystemActorComponent->CurrentCoverPlace->myState = ECoverPlaceState::FREE;
-	Destroy();
-}
-
-// Called when the game starts or when spawned
-void ACoverSystemCharacter::BeginPlay()
-{
-	Super::BeginPlay();
+	CoverSystemActorComponent->FreeUpCoverPlace();
+	if(CoverSystemActorComponent->RegisteredCoverPlace)
+		CoverSystemActorComponent->RegisteredCoverPlace->ChangeState(ECoverPlaceState::FREE);
+				
 	
-}
-
-// Called every frame
-void ACoverSystemCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void ACoverSystemCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	Destroy();
 }
 

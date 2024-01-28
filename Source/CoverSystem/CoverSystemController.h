@@ -8,6 +8,9 @@
 #include "GameFramework/Actor.h"
 #include "CoverSystemController.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCoverPlaceStateChangedDelegate,ACoverPlace*, coverPlace, ECoverPlaceState, coverPlaceState);
+
 UCLASS()
 class COVERSYSTEM_API ACoverSystemController : public AActor
 {
@@ -16,6 +19,8 @@ class COVERSYSTEM_API ACoverSystemController : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACoverSystemController();
+
+	FCoverPlaceStateChangedDelegate OnCoverPlaceStateChanged;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ACoverPlace*> CoverPlaces;
