@@ -7,7 +7,7 @@
 #include "CoverActorProperties.generated.h"
 
 /**
- * Clasa przetrzymująca dane dla aktora uzywajacego cover systemu. Steruja one sposobem doboru miejsca przez aktora
+ * A class that holds data for an actor using the cover system. They control how the actor chooses cover place
  */
 UCLASS()
 class COVERSYSTEM_API UCoverActorProperties : public UDataAsset

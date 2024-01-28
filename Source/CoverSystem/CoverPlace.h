@@ -33,6 +33,7 @@ public:
 	UPROPERTY()
 	UCoverSystemActorComponent* coverSystemComponent;
 
+	//Additional info can hold custom info without need of modyfing this class or creating more fields that may not be used
 	UPROPERTY()
 	TMap<FKey, FString> AdditionalInfoMap;
 	
@@ -106,14 +107,16 @@ public:
 	void AnalyseTargetsByAngle(TArray<UTargetInfo*>& targets);
 
 	void AnalyseBlockingVisibility(TArray<UTargetInfo*>& targets);
-	
-	UPROPERTY(EditAnywhere, Category="Cover")
+
+
+	//toggle these if you want to enable actor to shoot in direction
+	UPROPERTY(EditAnywhere, Category="Visibility")
 	bool visibilityRight = true;
-	UPROPERTY(EditAnywhere, Category="Cover")
+	UPROPERTY(EditAnywhere, Category="Visibility")
 	bool visibilityLeft;
-	UPROPERTY(EditAnywhere, Category="Cover")
+	UPROPERTY(EditAnywhere, Category="Visibility")
 	bool visibilityForward;
-	UPROPERTY(EditAnywhere, Category="Cover")
+	UPROPERTY(EditAnywhere, Category="Visibility")
 	bool visibilityBackward;
 
 	UPROPERTY(EditAnywhere, Category="Cover")

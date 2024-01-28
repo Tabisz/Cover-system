@@ -63,7 +63,6 @@ ACoverSystemController* ACoverPlace::GetCoverSystemController() const
 	else
 		return nullptr;
 }
-
 TArray<UTargetInfo*> ACoverPlace::GetAllValidTargets()
 {
 	TArray<UTargetInfo*> targetsInfo = TArray<UTargetInfo*>();
@@ -101,7 +100,7 @@ float ACoverPlace::CalculateDistance(UCoverSystemActorComponent* CoverSystemActo
 {
 	return FVector::Distance( GetActorLocation(),CoverSystemActorComponent->GetOwner()->GetActorLocation());
 }
-
+//calculating angle between this and other actor to set is to range from 0 to 360 going clockwise
 float ACoverPlace::CalculateAngle(UCoverSystemActorComponent* CoverSystemActorComponent)
 {
 	FVector directionToTarget = CoverSystemActorComponent->GetOwner()->GetActorLocation() - GetActorLocation();
@@ -259,8 +258,6 @@ void ACoverPlace::DrawDebugVisibilityCone(EDirection directionToDraw, bool isCov
 		drawColor = FColor::Yellow;
 	else
 		drawColor = FColor::Green;
-
-	//DrawDebugVisibilityLine(drawAngle, searchDistance, FColor::Blue);
 	
 	float visibilityHalfAngle = FMath::DegreesToRadians(DEBUG_SystemProperties->VisibilityAngleRange/2);
 
