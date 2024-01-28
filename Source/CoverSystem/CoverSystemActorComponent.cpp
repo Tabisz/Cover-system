@@ -16,8 +16,6 @@ UCoverSystemActorComponent::UCoverSystemActorComponent()
 	
 }
 
-
-// Called when the game starts
 void UCoverSystemActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -91,19 +89,19 @@ ACoverPlace* UCoverSystemActorComponent::GetBestCoverPlace()
 				continue;
 			
 			if(TargetInfo->isInVisibilityRange)
-				currentCoverScore+=100/TargetInfo->distance;		//good position because you can shoot others
+				currentCoverScore+=(1000 * CoverActorProperties->canShootOthersSign)/TargetInfo->distance;		//good position because you can shoot others
 																	//closer -> better
 			
 			if(TargetInfo->isAbleToSeeYou)
 			{
 				if(TargetInfo->isFromCoveredSide)
-					currentCoverScore-=5;	//it is bad that someone can see you but you are in cover
+					currentCoverScore-=5* CoverActorProperties->canBeShootedSign;	//it is bad that someone can see you but you are in cover
 				else
-					currentCoverScore-=10; //or not
+					currentCoverScore-=10* CoverActorProperties->canBeShootedSign; //or not
 			}
 		}
 
-		currentCoverScore-= distanceToCover/100; //more distance is worse
+		currentCoverScore-= distanceToCover/100 * CoverActorProperties->distanceToCoverSign; //more distance is worse
 
 		
 		
@@ -124,13 +122,5 @@ ACoverSystemController* UCoverSystemActorComponent::GetCoverSystemController()
 		return Cast<ACoverSystemController>(GI->CoverSystemController.Get());
 	else
 		return nullptr;
-}
-
-// Called every frame
-void UCoverSystemActorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 

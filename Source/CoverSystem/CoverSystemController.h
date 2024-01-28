@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CoverPlace.h"
 #include "CoverSystemActorComponent.h"
+#include "CoverSystemProperties.h"
 #include "GameFramework/Actor.h"
 #include "CoverSystemController.generated.h"
 
@@ -37,9 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UnregisterActor(UCoverSystemActorComponent* Actor);
 
-	
-	UFUNCTION(BlueprintCallable)
-	ACoverPlace* GetRandomCoverPlace(UCoverSystemActorComponent* ActorRequesting);
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UCoverSystemProperties* CoverSystemProperties;
 
 protected:
 	// Called when the game starts or when spawned

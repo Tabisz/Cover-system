@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CoverSystemActorComponent.h"
+#include "CoverSystemProperties.h"
 #include "GameFramework/Actor.h"
 #include "CoverPlace.generated.h"
 
@@ -129,6 +130,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="Debug")
 	bool enableDebug;
 
+	UPROPERTY(EditAnywhere, Category="Debug")
+	UCoverSystemProperties* DEBUG_SystemProperties;
+
 	/** Allows Tick To happen in the editor viewport*/
 	virtual bool ShouldTickIfViewportsOnly() const override;
 
@@ -141,7 +145,7 @@ public:
 	void DrawDebug();
 	
 	UFUNCTION(BlueprintCallable, Category="Debug")
-	void DrawDebugVisibilityCone(EDirection directionToDraw, float visibilityHalfAngle, float searchDistance, bool isCovered, bool discoveredEnemy);
+	void DrawDebugVisibilityCone(EDirection directionToDraw, bool isCovered, bool discoveredEnemy);
 	
 	UFUNCTION(BlueprintCallable, Category="Debug")
 	void DrawDebugVisibilityLine(float drawAngle, float Distance, FColor color);

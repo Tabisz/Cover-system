@@ -35,14 +35,6 @@ void ACoverSystemController::UnregisterActor(UCoverSystemActorComponent* Actor)
 		CoverActors.Remove(Actor);
 }
 
-ACoverPlace* ACoverSystemController::GetRandomCoverPlace(UCoverSystemActorComponent* ActorRequesting)
-{
-	if(CoverPlaces.Num()== 0)
-		return nullptr;
-	
-	return CoverPlaces[FMath::RandRange(1, CoverPlaces.Num()-1) ];
-}
-
 // Called when the game starts or when spawned
 void ACoverSystemController::BeginPlay()
 {

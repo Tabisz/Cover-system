@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CoverActorProperties.h"
 #include "Components/ActorComponent.h"
 #include "CoverSystemActorComponent.generated.h"
 
@@ -24,6 +25,9 @@ public:
 
 	FInit OnRegisterCompleted;
 	FRequestAdditionalInfo OnAdditionalInfoUpdateRequest;
+
+	UPROPERTY(EditAnywhere)
+	UCoverActorProperties* CoverActorProperties;
 
 	UPROPERTY(BlueprintReadOnly)
 	ACoverSystemController* CoverSystemController;
@@ -55,13 +59,4 @@ protected:
 	virtual void BeginPlay() override;
 
 	ACoverSystemController* GetCoverSystemController();
-	
-
-	
-
-public:
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };

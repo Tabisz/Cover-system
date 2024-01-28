@@ -20,7 +20,7 @@ class COVERSYSTEM_API ACoverSystemCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite,EditDefaultsOnly)
 	UCoverSystemActorComponent* CoverSystemActorComponent;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
